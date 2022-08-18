@@ -40,10 +40,7 @@ const Review = ({ review, index, editable,handleRating }) => {
         </div>
       </div>
       <p style={{ margin: "0", paddingLeft: "70px" }}>
-        We used this company on a paris-new york flight, the plane was 1 hour
-        late on the way out and was on time on the way back, boeing 767 rather
-        comfortable, pillow, blanket and headphones available, many films in
-        French to watch during the flight, very friendly staff, …
+        {review.comment}
       </p>
 
       <hr/>

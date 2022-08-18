@@ -4,14 +4,16 @@ body {
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   padding: 0 1rem 1rem 1rem;
   max-width: 680px;
-  margin: 0 auto;
+  margin: 0 auto !important;
   background: #fff;
   color: #333;
 }
 
+
+
 ul {
-list-style: none;
-padding: 0;
+  list-style: none;
+  padding: 0 !important;
 }
 li,
 p {

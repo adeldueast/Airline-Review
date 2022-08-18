@@ -63,7 +63,6 @@ export const getReviewsSubscription = (airlineId, userId, handleSetReviewsData) 
     arrayMove(reviews, userReviewIndex, 0);
     //Calculat the avg rating of all reviews 
     const avgRating = reviews.reduce((total, next) => total + next.value, 0) / reviews.length;
-    console.log(avgRating);
     //set States 
     handleSetReviewsData(reviews,avgRating.toFixed(2))
   
@@ -86,7 +85,8 @@ export const getUserReview = async (userId, airlineId) => {
 };
 
 export const upsertReview = async (review) => {
-  const docId = `${review.userId}_${review.airlineId}`;
+
+  const docId = `${review.userId}_${review.name}`;
   const docRef = doc(getFirestore(getApp()), "reviews", docId);
   try {
     return await setDoc(docRef, review, { merge: true });
@@ -98,10 +98,10 @@ export const upsertReview = async (review) => {
 // TODO: Check for more optimized way
 function arrayMove(arr, fromIndex, toIndex) {
   if (fromIndex === undefined) {
-    console.warn("user has no review.. 😡");
+    // console.warn("user has no review.. 😡");
     return;
   }
-  console.warn("user has a review! 😁");
+  // console.warn("user has a review! 😁");
   var element = arr[fromIndex];
   arr.splice(fromIndex, 1);
   arr.splice(toIndex, 0, element);

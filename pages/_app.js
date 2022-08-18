@@ -1,23 +1,11 @@
-import { useEffect } from 'react';
 import '../styles/globals.css'
 import initAuth from './../utils/initAuth';
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 initAuth()
 const MyApp = ({ Component, pageProps }) => {
 
-  useEffect(() => {
-  
-  }, [])
 
- return (
-  
-  
-  
-    
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    <Component {...pageProps} />
-  )
-
+ return <Component {...pageProps} />
 }
 
 

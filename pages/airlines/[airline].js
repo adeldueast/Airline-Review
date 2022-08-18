@@ -7,7 +7,9 @@ import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import Review from "./../../components/Review"
 import { getReviewsSubscription, upsertReview } from "../../utils/ReviewHelper."
-
+import Button from "react-bootstrap/Button"
+import ReviewModal from "../../components/ReviewModal"
+import Form from "react-bootstrap/Form"
 
 const Airline = () => {
   const AuthUser = useAuthUser()
@@ -15,20 +17,37 @@ const Airline = () => {
   const [airline] = useState(router.query)
   const [reviews, setReviews] = useState()
   const [avgRating, setAvgRating] = useState()
-  const [searchText,setSearchText] = useState('')
+  const [searchText, setSearchText] = useState("")
+  const [show, setShow] = useState(false)
 
-// Use Memo when returning HTML , other use CallBack source josh 
-  const filteredReviews = useCallback(() => (
-    reviews?.filter(review => review.userDisplayName.toLowerCase().includes(searchText.toLowerCase()))
-  ),[searchText,reviews])
+  const handleShow = () => setShow(true)
+  const handleNewReviewSaveChanges = async (new_review_rating,comment) => {
+    const review = {
+      airlineId: airline.id,
+      userDisplayName: AuthUser.displayName,
+      userId: AuthUser.id,
+      userImage: AuthUser.photoURL,
+      value: new_review_rating/100*5,
+      comment:comment
+    }
+    await upsertReview(review)
+    setShow(false)
+  }
 
+  // Use Memo when returning HTML , other use CallBack source josh
+  const filteredReviews = useCallback(
+    () =>
+      reviews?.filter((review) =>
+        review.userDisplayName.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    [searchText, reviews]
+  )
 
   const handleSetReviewsData = (reviews, avgRating) => {
     setReviews(reviews)
     setAvgRating(avgRating)
   }
 
-  
   useEffect(() => {
     const unsubscribe = getReviewsSubscription(
       airline.id,
@@ -41,15 +60,8 @@ const Airline = () => {
     }
   }, [])
 
-  // Why setting avgRating's state in a different useEffect causes flickering?
-  // useEffect(() => {
-  //   const avgRating = reviews.reduce((total, next) => total + next.value, 0) / reviews.length;
-  //   setAvgRating(avgRating);
-  // }, [reviews]);
-
   const handleRating = async (newRating, index) => {
     newRating = (newRating / 100) * 5
-    console.log(newRating)
     const reviewToUpdate = {
       ...reviews[index],
       value: newRating,
@@ -90,15 +102,18 @@ const Airline = () => {
             massa sed elementum tempus egestas sed
           </p>
           <h2>Average Rating</h2>
+     
           <div style={styles.between}>
-            {reviews && reviews.length && (
-              <div style={styles.averageReviews}>{avgRating}</div>
-            )}
+            <div style={styles.averageReviews}>{isNaN(avgRating) ? '0'  : avgRating}</div>
             {
               //If no reviews, user never made a review..
               //If reviews, check if the first review belongs to authUser (id==id)
-              reviews && reviews[0].userId != AuthUser.id && (
-                <button onClick={addReview}>Give a review</button>
+              reviews && reviews[0]?.userId != AuthUser.id && (
+                <Button variant="primary" onClick={handleShow}>
+                  Give a review
+                </Button>
+
+                
               )
             }
           </div>
@@ -107,8 +122,22 @@ const Airline = () => {
 
       <hr />
 
-      <h2>Reviews</h2>
-      <input value={searchText} placeholder="Search user by username" onChange={e=>setSearchText(e.target.value)}/>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignContent: "center",
+          marginBottom: "15px",
+        }}
+      >
+        <h2>Reviews</h2>
+        <Form.Control
+          value={searchText}
+          placeholder="Search user by username"
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ maxWidth: "240px" }}
+        />
+      </div>
       <ul>
         {filteredReviews()?.map((review, index) => {
           return (
@@ -117,7 +146,6 @@ const Airline = () => {
               style={{ display: "flex", flexDirection: "column" }}
             >
               <Review
-
                 review={review}
                 index={index}
                 handleRating={handleRating}
@@ -127,6 +155,13 @@ const Airline = () => {
           )
         })}
       </ul>
+
+      <ReviewModal
+        show={show}
+        setShow={setShow}
+        handleSaveChanges={handleNewReviewSaveChanges}
+        airline={airline}
+      />
     </>
   )
 }
@@ -159,7 +194,7 @@ const styles = {
   },
   averageReviews: {
     backgroundColor: "#2B6AD0",
-    padding: "2px 6px",
+   
     borderRadius: "10px",
     color: "white",
     width: "3rem",
