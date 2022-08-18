@@ -1,0 +1,28 @@
+{
+  "name": "airline-reviews",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "firebase": "^9.9.2",
+    "firebase-admin": "^11.0.1",
+    "firebaseui": "^6.0.1",
+    "lodash": "^4.17.21",
+    "next": "12.2.5",
+    "next-firebase-auth": "^1.0.0-canary.14",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-firebaseui": "^6.0.0",
+    "react-modal": "^3.15.1",
+    "react-simple-star-rating": "^4.0.5"
+  },
+  "devDependencies": {
+    "eslint": "8.21.0",
+    "eslint-config-next": "12.2.5"
+  }
+}
