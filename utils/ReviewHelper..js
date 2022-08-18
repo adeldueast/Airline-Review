@@ -64,7 +64,7 @@ export const getReviewsSubscription = (airlineId, userId, handleSetReviewsData) 
     //Calculat the avg rating of all reviews 
     const avgRating = reviews.reduce((total, next) => total + next.value, 0) / reviews.length;
     //set States 
-    handleSetReviewsData(reviews,avgRating.toFixed(2))
+    handleSetReviewsData(reviews,avgRating.toFixed(1))
   
   });
 };

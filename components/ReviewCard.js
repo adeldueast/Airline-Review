@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Rating } from "react-simple-star-rating";
 import Image from "next/image";
 
-const Review = ({ review, index, editable,handleRating }) => {
+const ReviewCard = ({ review, index, editable,handleRating }) => {
 
 
   return (
@@ -49,4 +49,4 @@ const Review = ({ review, index, editable,handleRating }) => {
   );
 };
 
-export default Review;
+export default ReviewCard;

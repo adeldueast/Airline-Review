@@ -4,7 +4,7 @@ const nextConfig = {
     domains: ["image.tmdb.org", "lh3.googleusercontent.com","open-flights.s3.amazonaws.com"],
   },
   // TODO: set restrict mode back to true. only fix until PL merge https://github.com/firebase/firebaseui-web-react/pull/173
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
 };
 

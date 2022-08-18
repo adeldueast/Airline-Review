@@ -5,7 +5,7 @@ import Image from "next/image"
 import _ from "lodash"
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
-import Review from "./../../components/Review"
+import ReviewCard from "../../components/ReviewCard"
 import { getReviewsSubscription, upsertReview } from "../../utils/ReviewHelper."
 import Button from "react-bootstrap/Button"
 import ReviewModal from "../../components/ReviewModal"
@@ -20,21 +20,33 @@ const Airline = () => {
   const [searchText, setSearchText] = useState("")
   const [show, setShow] = useState(false)
 
+  //Toggle the create review modal
   const handleShow = () => setShow(true)
-  const handleNewReviewSaveChanges = async (new_review_rating,comment) => {
+
+  //handle to UPDATE existing review of user (triggered in create review modal )
+  const handleNewReviewSaveChanges = async (new_review_rating, comment) => {
     const review = {
       airlineId: airline.id,
       userDisplayName: AuthUser.displayName,
       userId: AuthUser.id,
       userImage: AuthUser.photoURL,
-      value: new_review_rating/100*5,
-      comment:comment
+      value: (new_review_rating / 100) * 5,
+      comment: comment,
     }
     await upsertReview(review)
     setShow(false)
   }
+  //handle to UPDATE existing review of user (triggered in <li>Review</li>)
+  const handleRating = async (newRating, index) => {
+    newRating = (newRating / 100) * 5
+    const reviewToUpdate = {
+      ...reviews[index],
+      value: newRating,
+    }
+    await upsertReview(reviewToUpdate)
+  }
 
-  // Use Memo when returning HTML , other use CallBack source josh
+  // This is similar to a useEffect, but we still have filteredReviews in scope
   const filteredReviews = useCallback(
     () =>
       reviews?.filter((review) =>
@@ -43,11 +55,13 @@ const Airline = () => {
     [searchText, reviews]
   )
 
+  //function passed the onSnapshot subcription to setState of reviews & avg rating
   const handleSetReviewsData = (reviews, avgRating) => {
     setReviews(reviews)
     setAvgRating(avgRating)
   }
 
+  //use effect to subscribe to review's changes in firestore
   useEffect(() => {
     const unsubscribe = getReviewsSubscription(
       airline.id,
@@ -60,31 +74,10 @@ const Airline = () => {
     }
   }, [])
 
-  const handleRating = async (newRating, index) => {
-    newRating = (newRating / 100) * 5
-    const reviewToUpdate = {
-      ...reviews[index],
-      value: newRating,
-    }
-    await upsertReview(reviewToUpdate)
-  }
-
-  const addReview = async () => {
-    const review = {
-      airlineId: airline.id,
-      userDisplayName: AuthUser.displayName,
-      userId: AuthUser.id,
-      userImage: AuthUser.photoURL,
-      value: 1,
-    }
-    await upsertReview(review)
-  }
-
   return (
     <>
       <Header user={AuthUser} />
-      <h1>{airline.name}</h1>
-
+      <h1 style={{marginTop:'20px'}}>{airline.name}</h1>
       <div style={styles.information}>
         <div style={styles.imageWrapper}>
           <Image
@@ -97,14 +90,16 @@ const Airline = () => {
         </div>
         <div>
           <p>
-            aliquam nulla facilisi cras fermentum odio eu feugiat pretium nibh
-            ipsum consequat nisl vel pretium lectus quam id leo in vitae turpis
-            massa sed elementum tempus egestas sed
+            THIS PAGE IS CLIENT-SIDE RENDERING pretium nibh ipsum consequat nisl
+            vel pretium lectus quam id leo in vitae turpis massa sed elementum
+            tempus egestas sed
           </p>
-          <h2>Average Rating</h2>
-     
+          <h2 >Average Rating</h2>
+
           <div style={styles.between}>
-            <div style={styles.averageReviews}>{isNaN(avgRating) ? '0'  : avgRating}</div>
+            <div style={styles.averageReviews}>
+              {isNaN(avgRating) ? "0" : avgRating}
+            </div>
             {
               //If no reviews, user never made a review..
               //If reviews, check if the first review belongs to authUser (id==id)
@@ -112,8 +107,6 @@ const Airline = () => {
                 <Button variant="primary" onClick={handleShow}>
                   Give a review
                 </Button>
-
-                
               )
             }
           </div>
@@ -130,7 +123,7 @@ const Airline = () => {
           marginBottom: "15px",
         }}
       >
-        <h2>Reviews</h2>
+        <h2 style={{margin:'0'}}>Reviews</h2>
         <Form.Control
           value={searchText}
           placeholder="Search user by username"
@@ -138,6 +131,7 @@ const Airline = () => {
           style={{ maxWidth: "240px" }}
         />
       </div>
+
       <ul>
         {filteredReviews()?.map((review, index) => {
           return (
@@ -145,7 +139,7 @@ const Airline = () => {
               key={review.id}
               style={{ display: "flex", flexDirection: "column" }}
             >
-              <Review
+              <ReviewCard
                 review={review}
                 index={index}
                 handleRating={handleRating}
@@ -162,6 +156,7 @@ const Airline = () => {
         handleSaveChanges={handleNewReviewSaveChanges}
         airline={airline}
       />
+
     </>
   )
 }
@@ -180,6 +175,7 @@ const styles = {
     alignItems: "center",
   },
   information: {
+  
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
@@ -194,7 +190,7 @@ const styles = {
   },
   averageReviews: {
     backgroundColor: "#2B6AD0",
-   
+
     borderRadius: "10px",
     color: "white",
     width: "3rem",
