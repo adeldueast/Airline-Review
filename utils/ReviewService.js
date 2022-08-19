@@ -1,23 +1,14 @@
 import { getApp } from "firebase/app";
 import {
-  addDoc,
   collection,
   doc,
-  FieldValue,
   getDoc,
   getDocs,
   getFirestore,
-  limit,
   onSnapshot,
-  orderBy,
   query,
   setDoc,
-  startAfter,
-  startAt,
-  Timestamp,
-  updateDoc,
   where,
-  serverTimestamp
 } from "firebase/firestore";
 
 
