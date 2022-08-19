@@ -2,7 +2,6 @@ import { useRouter } from "next/router"
 import { withAuthUser, AuthAction, useAuthUser } from "next-firebase-auth"
 import FullPageLoader from "../../components/FullPageLoader"
 import Image from "next/image"
-import _ from "lodash"
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import ReviewCard from "../../components/ReviewCard"
@@ -10,7 +9,6 @@ import { getReviewsSubscription, upsertReview } from "../../utils/ReviewService"
 import Button from "react-bootstrap/Button"
 import ReviewModal from "../../components/ReviewModal"
 import Form from "react-bootstrap/Form"
-
 
 const Airline = () => {
   const AuthUser = useAuthUser()
@@ -22,9 +20,6 @@ const Airline = () => {
   const [show, setShow] = useState(false)
   const [userReview, setuserReview] = useState()
 
-
-
-
   //handle to UPDATE existing review of user (triggered in create review modal )
   const handleNewReviewSaveChanges = async (new_review_rating, comment) => {
     // console.warn('XOXOXOXO',new_review_rating, comment);
@@ -34,7 +29,7 @@ const Airline = () => {
       userId: AuthUser.id,
       userImage: AuthUser.photoURL,
       value: (new_review_rating / 100) * 5,
-      comment: comment ?? '',
+      comment: comment ?? "",
     }
     await upsertReview(review)
     setShow(false)
@@ -64,11 +59,10 @@ const Airline = () => {
     setAvgRating(avgRating),
     setuserReview(userReview)
     // console.error('2',userReview)
-  
   }
-
   //use effect to subscribe/unsubscribe to review's changes in firestore
   useEffect(() => {
+
     const unsubscribe = getReviewsSubscription(
       airline.id,
       AuthUser.id,
@@ -76,15 +70,16 @@ const Airline = () => {
     )
 
     return () => {
-      // console.warn("clearing subscription..")
-      unsubscribe
+      console.warn("clearing subscription..")
+      unsubscribe();
     }
   }, [])
+
 
   return (
     <>
       <Header user={AuthUser} />
-      <h1 style={{marginTop:'20px'}}>{airline.name}</h1>
+      <h1 style={{ marginTop: "20px" }}>{airline.name}</h1>
       <div style={styles.information}>
         <div style={styles.imageWrapper}>
           <Image
@@ -96,11 +91,23 @@ const Airline = () => {
             priority
           />
         </div>
-        <div style={{display:'flex',flexDirection:'column', justifyContent:'space-between'}} >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+          }}
+        >
           <p>
-            <strong>THIS PAGE IS CLIENT-SIDE RENDERING</strong> habitasse platea dictumst vestibulum rhoncus est pellentesque elit ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at augue eget arcu dictum varius duis at consectetur lorem donec massa sapien faucibus et molestie ac feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare massa eget egestas purus viverra accumsan
+            <strong>THIS PAGE IS CLIENT-SIDE RENDERING</strong> habitasse platea
+            dictumst vestibulum rhoncus est pellentesque elit ullamcorper
+            dignissim cras tincidunt lobortis feugiat vivamus at augue eget arcu
+            dictum varius duis at consectetur lorem donec massa sapien faucibus
+            et molestie ac feugiat sed lectus vestibulum mattis ullamcorper
+            velit sed ullamcorper morbi tincidunt ornare massa eget egestas
+            purus viverra accumsan
           </p>
-          <h2 >Average Rating</h2>
+          <h2>Average Rating</h2>
 
           <div style={styles.between}>
             <div style={styles.averageReviews}>
@@ -110,7 +117,7 @@ const Airline = () => {
               //If no reviews, user never made a review..
               //If reviews, check if the first review belongs to authUser (id==id)
               reviews && reviews[0]?.userId != AuthUser.id && (
-                <Button variant="primary" onClick={()=>setShow(true)}>
+                <Button variant="primary" onClick={() => setShow(true)}>
                   Give a review
                 </Button>
               )
@@ -129,7 +136,7 @@ const Airline = () => {
           marginBottom: "15px",
         }}
       >
-        <h2 style={{marginlscls:'0'}}>Reviews</h2>
+        <h2 style={{ marginlscls: "0" }}>Reviews</h2>
         <Form.Control
           value={searchText}
           placeholder="Search user by username"
@@ -146,7 +153,7 @@ const Airline = () => {
               style={{ display: "flex", flexDirection: "column" }}
             >
               <ReviewCard
-                authUserId ={AuthUser.id}
+                authUserId={AuthUser.id}
                 review={review}
                 index={index}
                 handleRating={handleRating}
@@ -160,12 +167,11 @@ const Airline = () => {
 
       <ReviewModal
         show={show}
-        setShow={setShow}
+        onHide={()=>setShow(false)}
         handleSaveChanges={handleNewReviewSaveChanges}
         airline={airline}
         review={userReview ?? null}
       />
-
     </>
   )
 }
@@ -184,7 +190,6 @@ const styles = {
     alignItems: "center",
   },
   information: {
-  
     display: "flex",
     justifyContent: "center",
     // alignItems: "flex-start",
@@ -196,7 +201,7 @@ const styles = {
     height: "auto",
     // borderRadius: "50%",
     // overflow: "hidden",
-    position:'relative'
+    position: "relative",
   },
   averageReviews: {
     backgroundColor: "#2B6AD0",

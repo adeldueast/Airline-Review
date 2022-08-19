@@ -2,11 +2,10 @@ import Button from "react-bootstrap/Button"
 import Modal from "react-bootstrap/Modal"
 import { Rating } from "react-simple-star-rating"
 import Form from "react-bootstrap/Form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-const ReviewModal = ({ show, setShow, handleSaveChanges, airline ,review}) => {
+const ReviewModal = ({ show, onHide, handleSaveChanges, airline ,review}) => {
 
-  const handleClose = () => setShow(false)
   //ex: revew.value =   2(database)   should be 20(rating component)
   const [rating, setRating] = useState( review?.value/5*100 )
   const [comment, setComment] = useState(review?.comment)
@@ -15,6 +14,11 @@ const ReviewModal = ({ show, setShow, handleSaveChanges, airline ,review}) => {
   // console.log(review)
   // console.warn(rating)
   // console.warn(comment)
+  useEffect(() => {
+    setRating(review?.value/5*100 )
+    setComment(review?.comment)
+ 
+  }, [review])
   
 
   const handleRating = (rate) => {
@@ -30,7 +34,7 @@ const ReviewModal = ({ show, setShow, handleSaveChanges, airline ,review}) => {
 
   return (
     <Modal 
-    show={show} onHide={handleClose}
+    show={show} onHide={onHide}
     centered
     >
       <Modal.Header closeButton>
@@ -54,7 +58,7 @@ const ReviewModal = ({ show, setShow, handleSaveChanges, airline ,review}) => {
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="secondary" onClick={onHide}>
           Close
         </Button>
         <Button variant="primary" onClick={() => handleSaveChanges(rating,comment)}>

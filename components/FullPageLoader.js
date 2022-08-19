@@ -1,4 +1,3 @@
-import logo from '../public/logo.svg';
 
 const styles = {
   container: {

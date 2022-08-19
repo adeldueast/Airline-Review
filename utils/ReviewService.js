@@ -1,23 +1,16 @@
 import { getApp } from "firebase/app";
 import {
-  addDoc,
   collection,
   doc,
-  FieldValue,
   getDoc,
   getDocs,
   getFirestore,
-  limit,
   onSnapshot,
-  orderBy,
   query,
   setDoc,
-  startAfter,
-  startAt,
-  Timestamp,
-  updateDoc,
+
   where,
-  serverTimestamp
+
 } from "firebase/firestore";
 
 
@@ -42,7 +35,7 @@ export const getReviews = async (airlineId) => {
   }
 };
 
-export const  getReviewsSubscription = async (airlineId, userId, handleSetReviewsData) => {
+export const  getReviewsSubscription =  (airlineId, userId, handleSetReviewsData) => {
   //query to get all reviews of airline
   const queryRef = query(collection(getFirestore(getApp()), "reviews"),where("airlineId", "==", airlineId));
   //return subscribtion 
