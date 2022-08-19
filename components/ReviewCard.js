@@ -1,8 +1,9 @@
-import { useState } from "react";
 import { Rating } from "react-simple-star-rating";
+import ReactTimeAgo from 'react-time-ago'
 import Image from "next/image";
+import Button from "react-bootstrap/Button"
 
-const ReviewCard = ({ review, index, editable,handleRating }) => {
+const ReviewCard = ({ review, index, editable,handleRating,authUserId,setShow }) => {
 
 
   return (
@@ -25,7 +26,17 @@ const ReviewCard = ({ review, index, editable,handleRating }) => {
           />
         </div>
         <div style={{ width: "100%" }}>
-          <h3 style={{ margin: "0" }}>{review.userDisplayName}</h3>
+          <div  style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <h3 style={{ margin: "0" }}>{review.userDisplayName}</h3>
+            {review.userId == authUserId &&
+              <Button 
+              ariant="primary" 
+              onClick={()=>setShow(true)}
+              >
+                  Modify review
+              </Button>  
+            }
+          </div>
           <Rating
             /* Available Props */
             onClick={value => handleRating(value, index)}
@@ -34,8 +45,12 @@ const ReviewCard = ({ review, index, editable,handleRating }) => {
             allowHalfIcon
             readonly={editable}
           />
+          {/* <span>{review.createdAt}</span> */}
           <span style={{ marginLeft: "0.6rem", fontSize: "0.8rem" }}>
-            2 weeks ago
+            <ReactTimeAgo 
+            date={new Date(review.createdAt.seconds * 1000)} 
+            locale="en-US"
+            />
           </span>
         </div>
       </div>
@@ -44,6 +59,7 @@ const ReviewCard = ({ review, index, editable,handleRating }) => {
       </p>
 
       <hr/>
+      
       
     </>
   );

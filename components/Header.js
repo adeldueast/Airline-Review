@@ -1,5 +1,6 @@
-import Link from "next/link";
-import styles from "./Header.module.css";
+import Image from "next/image"
+import Link from "next/link"
+import styles from "./Header.module.css"
 
 const Header = ({ user }) => {
   // const styles = {
@@ -26,32 +27,30 @@ const Header = ({ user }) => {
   return (
     <header>
       <div className={styles.signedInStatus}>
-        <p
-          className={`nojs-show ${ styles.loaded }`}
-        >
+        <div className={`nojs-show ${styles.loaded}`}>
           {!user.email && (
             <>
               <span className={styles.notSignedInText}>
                 You are not signed in
               </span>
               <Link href="/auth">
-                <a
-                  className={styles.buttonPrimary}
-                >
-                  Sign in
-                </a>
+                <a className={styles.buttonPrimary}>Sign in</a>
               </Link>
             </>
           )}
+
           {user.email && (
             <>
-              {user.photoURL && (
-                <img 
-                className={styles.avatar}
-                src={user.photoURL}
+              <div className={styles.avatar}>
+                <Image
+                  src={user.photoURL}
+                  width="100%"
+                  height="100%"
+                  layout="responsive"
+                  objectFit="cover"
                 />
-              
-              )}
+              </div>
+              {/* <img className={styles.avatar} src={user.photoURL}/> */}
               <span className={styles.signedInText}>
                 <small>Signed in as</small>
                 <br />
@@ -61,20 +60,20 @@ const Header = ({ user }) => {
                 // href={`/auth`}
                 className={styles.button}
                 onClick={() => {
-                  user.signOut();
+                  user.signOut()
                 }}
               >
                 Sign out
               </a>
             </>
           )}
-        </p>
+        </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
 
 {
   /* <header style={styles.container}>

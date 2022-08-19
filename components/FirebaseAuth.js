@@ -37,7 +37,7 @@ const FirebaseAuth = () => {
           email: result.user.email,
           image: result.user.photoURL
         }
-        console.log(userData);
+       // console.log(userData);
         setDoc(doc(db, 'users', `${ result.user.uid}`), userData, { merge: true })
         .catch(err=>console.error(err))
   

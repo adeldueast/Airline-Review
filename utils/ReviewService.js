@@ -3,6 +3,7 @@ import {
   addDoc,
   collection,
   doc,
+  FieldValue,
   getDoc,
   getDocs,
   getFirestore,
@@ -13,8 +14,10 @@ import {
   setDoc,
   startAfter,
   startAt,
+  Timestamp,
   updateDoc,
   where,
+  serverTimestamp
 } from "firebase/firestore";
 
 
@@ -39,7 +42,7 @@ export const getReviews = async (airlineId) => {
   }
 };
 
-export const getReviewsSubscription = (airlineId, userId, handleSetReviewsData) => {
+export const  getReviewsSubscription = async (airlineId, userId, handleSetReviewsData) => {
   //query to get all reviews of airline
   const queryRef = query(collection(getFirestore(getApp()), "reviews"),where("airlineId", "==", airlineId));
   //return subscribtion 
@@ -64,7 +67,8 @@ export const getReviewsSubscription = (airlineId, userId, handleSetReviewsData) 
     //Calculat the avg rating of all reviews 
     const avgRating = reviews.reduce((total, next) => total + next.value, 0) / reviews.length;
     //set States 
-    handleSetReviewsData(reviews,avgRating.toFixed(1))
+
+    handleSetReviewsData(reviews,avgRating.toFixed(1),reviews[0] ? reviews[0] : undefined)
   
   });
 };
@@ -75,6 +79,7 @@ export const getUserReview = async (userId, airlineId) => {
     const doc = await getDoc(docRef);
     const id = doc.id;
     const data = doc.data();
+   
     return {
       id,
       ...data,
@@ -89,7 +94,10 @@ export const upsertReview = async (review) => {
   const docId = `${review.userId}_${review.name}`;
   const docRef = doc(getFirestore(getApp()), "reviews", docId);
   try {
-    return await setDoc(docRef, review, { merge: true });
+    return await setDoc(docRef, {
+      ...review,
+      createdAt: new Date() 
+    }, { merge: true });
   } catch (error) {
     throw Error(error);
   }

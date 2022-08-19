@@ -6,10 +6,11 @@ import _ from "lodash"
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import ReviewCard from "../../components/ReviewCard"
-import { getReviewsSubscription, upsertReview } from "../../utils/ReviewHelper."
+import { getReviewsSubscription, upsertReview } from "../../utils/ReviewService"
 import Button from "react-bootstrap/Button"
 import ReviewModal from "../../components/ReviewModal"
 import Form from "react-bootstrap/Form"
+
 
 const Airline = () => {
   const AuthUser = useAuthUser()
@@ -19,24 +20,26 @@ const Airline = () => {
   const [avgRating, setAvgRating] = useState()
   const [searchText, setSearchText] = useState("")
   const [show, setShow] = useState(false)
+  const [userReview, setuserReview] = useState()
 
-  //Toggle the create review modal
-  const handleShow = () => setShow(true)
+
+
 
   //handle to UPDATE existing review of user (triggered in create review modal )
   const handleNewReviewSaveChanges = async (new_review_rating, comment) => {
+    // console.warn('XOXOXOXO',new_review_rating, comment);
     const review = {
       airlineId: airline.id,
       userDisplayName: AuthUser.displayName,
       userId: AuthUser.id,
       userImage: AuthUser.photoURL,
       value: (new_review_rating / 100) * 5,
-      comment: comment,
+      comment: comment ?? '',
     }
     await upsertReview(review)
     setShow(false)
   }
-  //handle to UPDATE existing review of user (triggered in <li>Review</li>)
+  //handle to UPDATE existing review of user (triggered in <li>Review</li>) (on stars hover click)
   const handleRating = async (newRating, index) => {
     newRating = (newRating / 100) * 5
     const reviewToUpdate = {
@@ -46,7 +49,7 @@ const Airline = () => {
     await upsertReview(reviewToUpdate)
   }
 
-  // This is similar to a useEffect, but we still have filteredReviews in scope
+  // This is similar to a useEffect, but we still have filteredReviews in scope to use in the component down below
   const filteredReviews = useCallback(
     () =>
       reviews?.filter((review) =>
@@ -56,21 +59,25 @@ const Airline = () => {
   )
 
   //function passed the onSnapshot subcription to setState of reviews & avg rating
-  const handleSetReviewsData = (reviews, avgRating) => {
+  const handleSetReviewsData = (reviews, avgRating, userReview) => {
     setReviews(reviews)
-    setAvgRating(avgRating)
+    setAvgRating(avgRating),
+    setuserReview(userReview)
+    // console.error('2',userReview)
+  
   }
 
-  //use effect to subscribe to review's changes in firestore
+  //use effect to subscribe/unsubscribe to review's changes in firestore
   useEffect(() => {
     const unsubscribe = getReviewsSubscription(
       airline.id,
       AuthUser.id,
       handleSetReviewsData
     )
+
     return () => {
-      console.warn("clearing subscription..")
-      unsubscribe()
+      // console.warn("clearing subscription..")
+      unsubscribe
     }
   }, [])
 
@@ -85,26 +92,25 @@ const Airline = () => {
             width="100%"
             height="100%"
             layout="responsive"
-            objectFit="cover"
+            objectFit="contain"
+            priority
           />
         </div>
-        <div>
+        <div style={{display:'flex',flexDirection:'column', justifyContent:'space-between'}} >
           <p>
-            THIS PAGE IS CLIENT-SIDE RENDERING pretium nibh ipsum consequat nisl
-            vel pretium lectus quam id leo in vitae turpis massa sed elementum
-            tempus egestas sed
+            <strong>THIS PAGE IS CLIENT-SIDE RENDERING</strong> habitasse platea dictumst vestibulum rhoncus est pellentesque elit ullamcorper dignissim cras tincidunt lobortis feugiat vivamus at augue eget arcu dictum varius duis at consectetur lorem donec massa sapien faucibus et molestie ac feugiat sed lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare massa eget egestas purus viverra accumsan
           </p>
           <h2 >Average Rating</h2>
 
           <div style={styles.between}>
             <div style={styles.averageReviews}>
-              {isNaN(avgRating) ? "0" : avgRating}
+              {isNaN(avgRating) ? " " : avgRating}
             </div>
             {
               //If no reviews, user never made a review..
               //If reviews, check if the first review belongs to authUser (id==id)
               reviews && reviews[0]?.userId != AuthUser.id && (
-                <Button variant="primary" onClick={handleShow}>
+                <Button variant="primary" onClick={()=>setShow(true)}>
                   Give a review
                 </Button>
               )
@@ -123,7 +129,7 @@ const Airline = () => {
           marginBottom: "15px",
         }}
       >
-        <h2 style={{margin:'0'}}>Reviews</h2>
+        <h2 style={{marginlscls:'0'}}>Reviews</h2>
         <Form.Control
           value={searchText}
           placeholder="Search user by username"
@@ -140,10 +146,12 @@ const Airline = () => {
               style={{ display: "flex", flexDirection: "column" }}
             >
               <ReviewCard
+                authUserId ={AuthUser.id}
                 review={review}
                 index={index}
                 handleRating={handleRating}
                 editable={!(review.userId == AuthUser.id)}
+                setShow={setShow}
               />
             </li>
           )
@@ -155,6 +163,7 @@ const Airline = () => {
         setShow={setShow}
         handleSaveChanges={handleNewReviewSaveChanges}
         airline={airline}
+        review={userReview ?? null}
       />
 
     </>
@@ -178,15 +187,16 @@ const styles = {
   
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
+    // alignItems: "flex-start",
     gap: "1rem",
     marginBottom: "20px",
   },
   imageWrapper: {
-    width: "300px",
-    borderRadius: "50%",
-    border: "1px solid rgb(239, 239, 239)",
-    overflow: "hidden",
+    width: "600px",
+    height: "auto",
+    // borderRadius: "50%",
+    // overflow: "hidden",
+    position:'relative'
   },
   averageReviews: {
     backgroundColor: "#2B6AD0",
