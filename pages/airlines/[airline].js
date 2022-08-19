@@ -53,14 +53,15 @@ const Airline = () => {
     [searchText, reviews]
   )
 
+  //function passed the onSnapshot subcription to setState of reviews & avg rating
+  const handleSetReviewsData = (reviews, avgRating, userReview) => {
+    setReviews(reviews)
+    setAvgRating(avgRating),
+    setuserReview(userReview)
+    // console.error('2',userReview)
+  }
   //use effect to subscribe/unsubscribe to review's changes in firestore
   useEffect(() => {
-    //function passed the onSnapshot subcription to setState of reviews & avg rating
-    const handleSetReviewsData = (reviews, avgRating, userReview) => {
-      setReviews(reviews)
-      setAvgRating(avgRating), setuserReview(userReview)
-      // console.error('2',userReview)
-    }
 
     const unsubscribe = getReviewsSubscription(
       airline.id,
@@ -69,10 +70,11 @@ const Airline = () => {
     )
 
     return () => {
-      // console.warn("clearing subscription..")
-      unsubscribe
+      console.warn("clearing subscription..")
+      unsubscribe();
     }
   }, [])
+
 
   return (
     <>

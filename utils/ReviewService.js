@@ -8,7 +8,9 @@ import {
   onSnapshot,
   query,
   setDoc,
+
   where,
+
 } from "firebase/firestore";
 
 
@@ -33,7 +35,7 @@ export const getReviews = async (airlineId) => {
   }
 };
 
-export const  getReviewsSubscription = async (airlineId, userId, handleSetReviewsData) => {
+export const  getReviewsSubscription =  (airlineId, userId, handleSetReviewsData) => {
   //query to get all reviews of airline
   const queryRef = query(collection(getFirestore(getApp()), "reviews"),where("airlineId", "==", airlineId));
   //return subscribtion 

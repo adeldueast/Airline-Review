@@ -2,7 +2,7 @@ import Button from "react-bootstrap/Button"
 import Modal from "react-bootstrap/Modal"
 import { Rating } from "react-simple-star-rating"
 import Form from "react-bootstrap/Form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const ReviewModal = ({ show, onHide, handleSaveChanges, airline ,review}) => {
 
@@ -14,6 +14,11 @@ const ReviewModal = ({ show, onHide, handleSaveChanges, airline ,review}) => {
   // console.log(review)
   // console.warn(rating)
   // console.warn(comment)
+  useEffect(() => {
+    setRating(review?.value/5*100 )
+    setComment(review?.comment)
+ 
+  }, [review])
   
 
   const handleRating = (rate) => {
@@ -29,7 +34,7 @@ const ReviewModal = ({ show, onHide, handleSaveChanges, airline ,review}) => {
 
   return (
     <Modal 
-    show={show} 
+    show={show} onHide={onHide}
     centered
     >
       <Modal.Header closeButton>
