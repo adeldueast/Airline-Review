@@ -1,8 +1,8 @@
 import { Rating } from "react-simple-star-rating";
-import ReactTimeAgo from 'react-time-ago'
+
 import Image from "next/image";
 import Button from "react-bootstrap/Button"
-
+import Moment from 'react-moment';
 const ReviewCard = ({ review, index, editable,handleRating,authUserId,setShow }) => {
 
 
@@ -47,10 +47,12 @@ const ReviewCard = ({ review, index, editable,handleRating,authUserId,setShow })
           />
           {/* <span>{review.createdAt}</span> */}
           <span style={{ marginLeft: "0.6rem", fontSize: "0.8rem" }}>
-            <ReactTimeAgo 
+            {/* <ReactTimeAgo 
             date={new Date(review.createdAt.seconds * 1000)} 
             locale="en-US"
-            />
+            /> */}
+            <Moment date={review.createdAt.seconds * 1000} fromNow></Moment>
+          
           </span>
         </div>
       </div>
