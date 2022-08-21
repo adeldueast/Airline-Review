@@ -43,7 +43,7 @@ const Airline = ({
       value: (new_review_rating / 100) * 5,
       comment: comment ?? "",
     }
-    console.log(review)
+    // console.log(review)
 
     await upsertReview(review)
     setShow(false)
@@ -236,7 +236,7 @@ export const getServerSideProps = withAuthUserSSR({
     reviews.reduce((total, next) => total + next.value, 0) / reviews.length
   ).toFixed(1)
   const userReview = userReviewIndex === undefined ? null : reviews[0]
-  console.log(reviews)
+  // console.log(reviews)
   return {
     props: {
       airlineProp: {
