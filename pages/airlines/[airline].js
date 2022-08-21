@@ -2,11 +2,9 @@ import {
   withAuthUser,
   AuthAction,
   useAuthUser,
-  withAuthUserTokenSSR,
   withAuthUserSSR,
   getFirebaseAdmin,
 } from "next-firebase-auth"
-import FullPageLoader from "../../components/FullPageLoader"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
@@ -192,9 +190,9 @@ const Airline = ({
 }
 
 // Note that this is a higher-order function.
-export const getServerSideProps = withAuthUserTokenSSR({
+export const getServerSideProps = withAuthUserSSR({
   whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
-})(async ({ params, AuthUser, req }) => {
+})(async ({ params, AuthUser }) => {
   const airlineId = params.airline
   // fetch all airlines in firestore and map it to airline array then send it to client in props
   const db = getFirebaseAdmin().firestore()
