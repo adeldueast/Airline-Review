@@ -2,11 +2,9 @@ import {
   withAuthUser,
   AuthAction,
   useAuthUser,
-  withAuthUserTokenSSR,
   withAuthUserSSR,
   getFirebaseAdmin,
 } from "next-firebase-auth"
-import FullPageLoader from "../../components/FullPageLoader"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
@@ -45,7 +43,7 @@ const Airline = ({
       value: (new_review_rating / 100) * 5,
       comment: comment ?? "",
     }
-    console.log(review)
+    // console.log(review)
 
     await upsertReview(review)
     setShow(false)
@@ -192,9 +190,9 @@ const Airline = ({
 }
 
 // Note that this is a higher-order function.
-export const getServerSideProps = withAuthUserTokenSSR({
+export const getServerSideProps = withAuthUserSSR({
   whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
-})(async ({ params, AuthUser, req }) => {
+})(async ({ params, AuthUser }) => {
   const airlineId = params.airline
   // fetch all airlines in firestore and map it to airline array then send it to client in props
   const db = getFirebaseAdmin().firestore()
@@ -238,7 +236,7 @@ export const getServerSideProps = withAuthUserTokenSSR({
     reviews.reduce((total, next) => total + next.value, 0) / reviews.length
   ).toFixed(1)
   const userReview = userReviewIndex === undefined ? null : reviews[0]
-  console.log(reviews)
+  // console.log(reviews)
   return {
     props: {
       airlineProp: {

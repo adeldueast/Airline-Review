@@ -1,7 +1,5 @@
-import Image from "next/image"
 import { getFirebaseAdmin } from "next-firebase-auth"
 import Link from "next/link"
-import Head from "next/head"
 
 import {
   useAuthUser,
