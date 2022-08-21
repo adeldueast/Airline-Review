@@ -4,11 +4,9 @@ import Link from "next/link"
 import Head from "next/head"
 
 import {
-  AuthAction,
   useAuthUser,
   withAuthUser,
   withAuthUserSSR,
-  withAuthUserTokenSSR,
 } from "next-firebase-auth"
 import Header from "../components/Header"
 const Home = ({ airlines }) => {
@@ -18,12 +16,7 @@ const Home = ({ airlines }) => {
     <li key={airline.id}>
       <Link
         href={{
-          pathname: `/airlines/${airline.name}`,
-          query: {
-            id: airline.id,
-            image: airline.image,
-            name: airline.name,
-          },
+          pathname: `/airlines/${airline.id}`,
         }}
       >
         <a>{airline.name}</a>
@@ -42,16 +35,17 @@ const Home = ({ airlines }) => {
 }
 
 // Note that this is a higher-order function.
-export const getServerSideProps = withAuthUserTokenSSR({
-  // whenUnauthed:AuthAction.REDIRECT_TO_LOGIN
-})(async (context) => {
+export const getServerSideProps = withAuthUserSSR({
+})(async ({AuthUser}) => {
+  console.log('AuthUser',AuthUser.AuthUser)
+
   // fetch all airlines in firestore and map it to airline array then send it to client in props
   const db = getFirebaseAdmin().firestore()
   const airlinesQuerySnapshot = await db.collection("airlines").get()
   const airlines = airlinesQuerySnapshot.docs.map((doc) => {
     return {
       id: doc.id,
-      ...doc.data(),
+      ...doc.data(),  
     }
   })
 
@@ -63,4 +57,5 @@ export const getServerSideProps = withAuthUserTokenSSR({
   }
 })
 
-export default withAuthUser()(Home)
+export default withAuthUser({
+})(Home)

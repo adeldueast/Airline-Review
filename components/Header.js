@@ -25,7 +25,7 @@ const Header = ({ user }) => {
   //   },
   // };
   return (
-    <header>
+    <header style={{marginBottom:'20px'}}>
       <div className={styles.signedInStatus}>
         <div className={`nojs-show ${styles.loaded}`}>
           {!user.email && (
@@ -67,6 +67,11 @@ const Header = ({ user }) => {
               </a>
             </>
           )}
+        </div>
+        <div style={{ display: "flex" }}>
+          <Link href="/">
+            <a>Go back home</a>
+          </Link>
         </div>
       </div>
     </header>

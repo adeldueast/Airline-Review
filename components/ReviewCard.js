@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button"
 import Moment from 'react-moment';
 const ReviewCard = ({ review, index, editable,handleRating,authUserId,setShow }) => {
 
-
+  
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -51,7 +51,8 @@ const ReviewCard = ({ review, index, editable,handleRating,authUserId,setShow })
             date={new Date(review.createdAt.seconds * 1000)} 
             locale="en-US"
             /> */}
-            <Moment date={review.createdAt.seconds * 1000} fromNow></Moment>
+            
+            <Moment date={review.createdAt._seconds ? review.createdAt._seconds * 1000 : review.createdAt.seconds * 1000 } fromNow></Moment>
           
           </span>
         </div>

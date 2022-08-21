@@ -4,6 +4,7 @@ import FullPageLoader from './../components/FullPageLoader';
 
 const styles = {
   content: {
+    marginTop:'200px',
     padding: `8px 32px`,
    'textAlign':'center'
   },
@@ -11,7 +12,7 @@ const styles = {
 
 const Auth = () => (
   <div style={styles.content}>
-    THIS IS THE AUTH PAGE  AND ITS CLIENT SIDE RENDERING.IT ALSO DISPLAYS A LOADER COMPONENT WHILE FIREBASE SDK LOADS (Optional)
+   <strong> THIS IS THE AUTH PAGE  AND ITS CLIENT SIDE RENDERING.IT ALSO DISPLAYS A LOADER COMPONENT WHILE FIREBASE SDK LOADS (Optional)</strong>
     <h3 >Sign in</h3>
     <div>
       <FirebaseAuth/>

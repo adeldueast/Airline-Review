@@ -1,24 +1,38 @@
-import { useRouter } from "next/router"
-import { withAuthUser, AuthAction, useAuthUser } from "next-firebase-auth"
+import {
+  withAuthUser,
+  AuthAction,
+  useAuthUser,
+  withAuthUserTokenSSR,
+  withAuthUserSSR,
+  getFirebaseAdmin,
+} from "next-firebase-auth"
 import FullPageLoader from "../../components/FullPageLoader"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import ReviewCard from "../../components/ReviewCard"
-import { getReviewsSubscription, upsertReview } from "../../utils/ReviewService"
+import {
+  arrayMove,
+  getReviewsSubscription,
+  upsertReview,
+} from "../../services/ReviewService"
 import Button from "react-bootstrap/Button"
 import ReviewModal from "../../components/ReviewModal"
 import Form from "react-bootstrap/Form"
 
-const Airline = () => {
+const Airline = ({
+  airlineProp,
+  reviewsProp,
+  avgRatingProp,
+  userReviewProp,
+}) => {
   const AuthUser = useAuthUser()
-  const router = useRouter()
-  const [airline] = useState(router.query)
-  const [reviews, setReviews] = useState()
-  const [avgRating, setAvgRating] = useState()
+  const [airline] = useState(airlineProp)
+  const [reviews, setReviews] = useState(reviewsProp)
+  const [avgRating, setAvgRating] = useState(avgRatingProp)
   const [searchText, setSearchText] = useState("")
   const [show, setShow] = useState(false)
-  const [userReview, setuserReview] = useState()
+  const [userReview, setuserReview] = useState(userReviewProp)
 
   //handle to UPDATE existing review of user (triggered in create review modal )
   const handleNewReviewSaveChanges = async (new_review_rating, comment) => {
@@ -31,6 +45,8 @@ const Airline = () => {
       value: (new_review_rating / 100) * 5,
       comment: comment ?? "",
     }
+    console.log(review)
+
     await upsertReview(review)
     setShow(false)
   }
@@ -58,11 +74,11 @@ const Airline = () => {
     setReviews(reviews)
     setAvgRating(avgRating),
     setuserReview(userReview)
+
     // console.error('2',userReview)
   }
   //use effect to subscribe/unsubscribe to review's changes in firestore
   useEffect(() => {
-
     const unsubscribe = getReviewsSubscription(
       airline.id,
       AuthUser.id,
@@ -71,10 +87,9 @@ const Airline = () => {
 
     return () => {
       console.warn("clearing subscription..")
-      unsubscribe();
+      unsubscribe()
     }
   }, [])
-
 
   return (
     <>
@@ -99,7 +114,7 @@ const Airline = () => {
           }}
         >
           <p>
-            <strong>THIS PAGE IS CLIENT-SIDE RENDERING</strong> habitasse platea
+            <strong>THIS PAGE IS SERVER-SIDE RENDERING</strong> habitasse platea
             dictumst vestibulum rhoncus est pellentesque elit ullamcorper
             dignissim cras tincidunt lobortis feugiat vivamus at augue eget arcu
             dictum varius duis at consectetur lorem donec massa sapien faucibus
@@ -167,7 +182,7 @@ const Airline = () => {
 
       <ReviewModal
         show={show}
-        onHide={()=>setShow(false)}
+        onHide={() => setShow(false)}
         handleSaveChanges={handleNewReviewSaveChanges}
         airline={airline}
         review={userReview ?? null}
@@ -176,11 +191,70 @@ const Airline = () => {
   )
 }
 
+// Note that this is a higher-order function.
+export const getServerSideProps = withAuthUserTokenSSR({
+  whenUnauthed: AuthAction.REDIRECT_TO_LOGIN,
+})(async ({ params, AuthUser, req }) => {
+  const airlineId = params.airline
+  // fetch all airlines in firestore and map it to airline array then send it to client in props
+  const db = getFirebaseAdmin().firestore()
+
+  const airlineRef = db.collection("airlines").doc(`${airlineId}`)
+
+  const airlineDocument = await airlineRef.get()
+  if (!airlineDocument.exists) {
+    return {
+      redirect: {
+        destination: "/404",
+        permanent: false,
+      },
+    }
+  }
+
+  const reviewsRef = db.collection("reviews")
+
+  const reviewsSnapshot = await reviewsRef
+    .where("airlineId", "==", airlineDocument.id)
+    .get()
+
+  let userReviewIndex = undefined
+  const reviews = reviewsSnapshot.docs.map((doc, i) => {
+    const id = doc.id
+    const data = doc.data()
+    //while mapping, check any review belongs to current user (userId)
+    if (data.userId == AuthUser.id) {
+      userReviewIndex = i
+    }
+
+    const review = {
+      id,
+      ...data,
+    }
+    return review
+  })
+
+  if (userReviewIndex && userReviewIndex != 0) arrayMove(reviews, userReviewIndex, 0)
+  const avgRating = (
+    reviews.reduce((total, next) => total + next.value, 0) / reviews.length
+  ).toFixed(1)
+  const userReview = userReviewIndex === undefined ? null : reviews[0]
+  console.log(reviews)
+  return {
+    props: {
+      airlineProp: {
+        id: airlineDocument.id,
+        ...airlineDocument.data(),
+      },
+      reviewsProp: JSON.parse(JSON.stringify(reviews)),
+      avgRatingProp: avgRating,
+      userReviewProp: JSON.parse(JSON.stringify(userReview))
+     
+    },
+  }
+})
+
 export default withAuthUser({
-  whenAuthed: AuthAction.RENDER, //The action to take if the user is authenticated
-  whenUnauthedBeforeInit: AuthAction.RETURN_NULL, //The action to take if the user is not authenticated but the Firebase client JS SDK has not yet initialized.
-  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN, //||NULL -> The action to take if the user is not authenticated and the Firebase client JS SDK has already initialized.
-  LoaderComponent: FullPageLoader,
+  whenUnauthedAfterInit: AuthAction.REDIRECT_TO_LOGIN, //The action to take if the user is authenticated
 })(Airline)
 
 const styles = {
