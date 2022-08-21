@@ -15,6 +15,7 @@ const ReviewModal = ({ show, onHide, handleSaveChanges, airline ,review}) => {
   // console.warn(rating)
   // console.warn(comment)
   useEffect(() => {
+
     setRating(review?.value/5*100 )
     setComment(review?.comment)
  

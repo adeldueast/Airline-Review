@@ -6,6 +6,10 @@ const nextConfig = {
   // TODO: set restrict mode back to true. only fix until PL merge https://github.com/firebase/firebaseui-web-react/pull/173
   reactStrictMode: false,
   swcMinify: true,
+  experimental: {
+    // Enables the styled-components SWC transform
+    styledComponents: true
+  }
 };
 
 module.exports = nextConfig;

@@ -9,6 +9,7 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth"
 const FirebaseAuth = () => {
   const firebaseAuthConfig = {
     signInFlow: "popup",
+    
     // Auth providers
     // https://github.com/firebase/firebaseui-web#configure-oauth-providers
     signInOptions: [
